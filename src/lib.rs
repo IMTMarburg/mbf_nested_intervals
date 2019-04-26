@@ -299,6 +299,10 @@ impl PyIntervalSet {
         Ok(self.inner.any_overlapping())
     }
 
+    pub fn overlap_status(&self) -> PyResult<Vec<bool>> {
+        Ok(self.inner.overlap_status())
+    }
+
     pub fn has_overlap(&mut self, start: u32, end: u32) -> PyResult<bool> {
         Ok(self.inner.has_overlap(&(start..end)))
     }
