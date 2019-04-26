@@ -11,6 +11,14 @@ def _df_to_tup(df):
     joined.sort(key=lambda tup: tup[0])
     return joined
 
+
+def _df_to_tup_no_strand(df):
+    joined = []
+    for ii, (chr, start, stop) in enumerate(zip(df['chr'], df['start'], df['stop'])):
+        joined.append((chr, start, stop, ii))
+    joined.sort(key=lambda tup: tup[0])
+    return joined
+
 def merge_df_intervals(df, iv_func=lambda iv: iv.merge_hull()):
     """take a DataFrame {chr, start, end, *} and merge overlapping intervals.
     * is from the last entry.
