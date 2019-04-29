@@ -5,7 +5,7 @@ from pathlib import Path
 import os
 
 
-os.chdir(str(Path(__file__).parent.absolute()))
+os.chdir(str(Path(__file__).parent.parent.absolute()))
 
 sys.path.insert(0, "../src")
 try:
@@ -25,7 +25,7 @@ cmd = [
     "run",
     "--rm",
     "-v",
-    str(Path('..').resolve().absolute()) + ":/io",
+    str(Path('.').resolve().absolute()) + ":/io",
     "quay.io/pypa/manylinux1_x86_64",
     "bash", "/io/release/build_wheels.sh"
 ]
