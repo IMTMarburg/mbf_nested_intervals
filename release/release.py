@@ -18,6 +18,8 @@ except (ImportError, AttributeError):
 if not Path('../.git').exists():
     raise ValueError("Must be run from a git, not a mercurial repo")
 
+subprocess.check_call(['python3', 'setup.py', 'sdist'])
+
 cmd = [
     "docker",
     "run",
