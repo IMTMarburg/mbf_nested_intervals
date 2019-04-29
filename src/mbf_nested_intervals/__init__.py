@@ -2,7 +2,13 @@ from .mbf_nested_intervals import *  # noqa:F401
 from mbf_nested_intervals import IntervalSet
 import pandas as pd
 import itertools
+from pkg_resources import get_distribution, DistributionNotFound
 
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    pass
 
 def _df_to_tup(df):
     joined = []
