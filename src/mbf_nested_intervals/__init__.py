@@ -6,10 +6,16 @@ import itertools
 
 def _df_to_tup(df):
     joined = []
-  
-
     for ii, (chr, start, stop,strand) in enumerate(zip(df['chr'], df['start'], df['stop'], df['strand'])):
         joined.append(((chr, strand), start, stop, ii))
+    joined.sort(key=lambda tup: tup[0])
+    return joined
+
+
+def _df_to_tup_no_strand(df):
+    joined = []
+    for ii, (chr, start, stop) in enumerate(zip(df['chr'], df['start'], df['stop'])):
+        joined.append((chr, start, stop, ii))
     joined.sort(key=lambda tup: tup[0])
     return joined
 
@@ -21,6 +27,9 @@ def merge_df_intervals(df, iv_func=lambda iv: iv.merge_hull()):
     """
     if not 'strand' in df.columns:
         df = df.assign(strand = 1)
+        strand_added = True
+    else:
+        strand_added =False
     joined = _df_to_tup(df)
     
     out = []
@@ -33,6 +42,8 @@ def merge_df_intervals(df, iv_func=lambda iv: iv.merge_hull()):
         new_df.at[:, "stop"] = [x[1] for x in new_order]
         out.append(new_df)
     res = pd.concat(out)
+    if strand_added:
+        res = res.drop('strand', axis=1)
     return res.sort_values(['chr','start'])
 
 
@@ -40,6 +51,9 @@ def merge_df_intervals_with_callback(df, callback):
     """take a {chr, start, end, *} dataframe and merge overlapping intervals, calling callback for group larger than one.."""
     if not 'strand' in df:
         df = df.assign(strand=1)
+        strand_added = True
+    else:
+        strand_added = False
     joined = _df_to_tup(df)
     result = []
     for chr, sub_group in itertools.groupby(joined, lambda tup: tup[0]):
@@ -69,4 +83,7 @@ def merge_df_intervals_with_callback(df, callback):
             row_data["stop"] = s[1]
 
             result.append(row_data)
-    return pd.DataFrame(result).sort_values(['chr','start'])
+    res = pd.DataFrame(result).sort_values(['chr','start'])
+    if strand_added:
+        res = res.drop('strand', axis=1)
+    return res

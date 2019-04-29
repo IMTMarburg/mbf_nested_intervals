@@ -1,4 +1,4 @@
-use nested_intervals::IntervalSet;
+use nested_intervals::{IntervalSet, NestedIntervalError};
 use pyo3::exceptions;
 use pyo3::prelude::*;
 use pyo3::class::PyObjectProtocol;
@@ -58,6 +58,14 @@ fn return_interval_set(py: Python, iv: IntervalSet) -> PyResult<Py<PyIntervalSet
     Ok(obj)
 }
 
+fn adapt_error<T>(input: Result<T, NestedIntervalError>) -> Result<T, PyErr> {
+    match input {
+        Ok(x) => Ok(x),
+        Err(x) => 
+                Err(PyErr::new::<exceptions::ValueError, _>(format!("{:?}", x)))
+    }
+}
+
 #[pymethods]
 impl PyIntervalSet {
     /// Create an IntervalSet from a list of tuples (start, stop)
@@ -75,7 +83,7 @@ impl PyIntervalSet {
             }
             intervals.push(tup.0..tup.1);
         }
-        return_interval_set(py, IntervalSet::new(&intervals))
+        return_interval_set(py, adapt_error(IntervalSet::new(&intervals))?)
     }
 
     /// Create an IntervalSet from a list of tuples (start, stop, id (integer))
@@ -98,7 +106,7 @@ impl PyIntervalSet {
             intervals.push(tup.0..tup.1);
             ids.push(tup.2);
         }
-        return_interval_set(py, IntervalSet::new_with_ids(&intervals, &ids))
+        return_interval_set(py, adapt_error(IntervalSet::new_with_ids(&intervals, &ids))?)
     }
 
     /// Convert an IntervalSet into a list of tuples (start, stop, [ids])
@@ -299,8 +307,12 @@ impl PyIntervalSet {
         Ok(self.inner.any_overlapping())
     }
 
+    pub fn overlap_status(&self) -> PyResult<Vec<bool>> {
+        Ok(self.inner.overlap_status())
+    }
+
     pub fn has_overlap(&mut self, start: u32, end: u32) -> PyResult<bool> {
-        Ok(self.inner.has_overlap(&(start..end)))
+        Ok(adapt_error(self.inner.has_overlap(&(start..end)))?)
     }
 
     pub fn get_overlap(&mut self, py: Python, start: u32, end: u32) -> PyResult<Py<PyIntervalSet>> {

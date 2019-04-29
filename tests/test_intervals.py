@@ -20,7 +20,7 @@ class TestIntervals:
                 {"index": 2, "chr": "1", "start": 0, "stop": 1100, "key": "c"},
                 {"index": 3, "chr": "2", "start": 900, "stop": 1100, "key": "d"},
             ]
-        ).set_index("index").assign(strand=1)
+        ).set_index("index")
         should.index.name = None
         assert_frame_equal(merged, should)
 
@@ -53,7 +53,7 @@ class TestIntervals:
                 {"index": 1, "chr": "Chromosome", "start": 400, "stop": 450},
                 {"index": 3, "chr": "Chromosome", "start": 600, "stop": 700},
             ]
-        ).set_index("index").assign(strand=1)
+        ).set_index("index")
         should.index.name = None
         assert_frame_equal(merged, should)
 
