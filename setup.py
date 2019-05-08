@@ -23,7 +23,6 @@ except VersionConflict:
 
 if __name__ == "__main__":
     setup(
-        use_pyscaffold=True,
         rust_extensions=[RustExtension("mbf_nested_intervals.mbf_nested_intervals", 
                                        binding=Binding.PyO3, debug=False)],
     )
