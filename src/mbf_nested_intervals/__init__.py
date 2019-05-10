@@ -2,17 +2,15 @@ from .mbf_nested_intervals import *  # noqa:F401
 from mbf_nested_intervals import IntervalSet
 import pandas as pd
 import itertools
-from pkg_resources import get_distribution, DistributionNotFound
 
-try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
-    # package is not installed
-    pass
+__version__ = "0.2.0"
+
 
 def _df_to_tup(df):
     joined = []
-    for ii, (chr, start, stop,strand) in enumerate(zip(df['chr'], df['start'], df['stop'], df['strand'])):
+    for ii, (chr, start, stop, strand) in enumerate(
+        zip(df["chr"], df["start"], df["stop"], df["strand"])
+    ):
         joined.append(((chr, strand), start, stop, ii))
     joined.sort(key=lambda tup: tup[0])
     return joined
@@ -20,10 +18,11 @@ def _df_to_tup(df):
 
 def _df_to_tup_no_strand(df):
     joined = []
-    for ii, (chr, start, stop) in enumerate(zip(df['chr'], df['start'], df['stop'])):
+    for ii, (chr, start, stop) in enumerate(zip(df["chr"], df["start"], df["stop"])):
         joined.append((chr, start, stop, ii))
     joined.sort(key=lambda tup: tup[0])
     return joined
+
 
 def merge_df_intervals(df, iv_func=lambda iv: iv.merge_hull()):
     """take a DataFrame {chr, start, end, *} and merge overlapping intervals.
@@ -31,13 +30,13 @@ def merge_df_intervals(df, iv_func=lambda iv: iv.merge_hull()):
 
 
     """
-    if not 'strand' in df.columns:
-        df = df.assign(strand = 1)
+    if not "strand" in df.columns:
+        df = df.assign(strand=1)
         strand_added = True
     else:
-        strand_added =False
+        strand_added = False
     joined = _df_to_tup(df)
-    
+
     out = []
     for chr_strand, sub_group in itertools.groupby(joined, lambda tup: tup[0]):
         args = [x[1:] for x in sub_group]
@@ -49,13 +48,13 @@ def merge_df_intervals(df, iv_func=lambda iv: iv.merge_hull()):
         out.append(new_df)
     res = pd.concat(out)
     if strand_added:
-        res = res.drop('strand', axis=1)
-    return res.sort_values(['chr','start'])
+        res = res.drop("strand", axis=1)
+    return res.sort_values(["chr", "start"])
 
 
 def merge_df_intervals_with_callback(df, callback):
     """take a {chr, start, end, *} dataframe and merge overlapping intervals, calling callback for group larger than one.."""
-    if not 'strand' in df:
+    if not "strand" in df:
         df = df.assign(strand=1)
         strand_added = True
     else:
@@ -89,7 +88,7 @@ def merge_df_intervals_with_callback(df, callback):
             row_data["stop"] = s[1]
 
             result.append(row_data)
-    res = pd.DataFrame(result).sort_values(['chr','start'])
+    res = pd.DataFrame(result).sort_values(["chr", "start"])
     if strand_added:
-        res = res.drop('strand', axis=1)
+        res = res.drop("strand", axis=1)
     return res
