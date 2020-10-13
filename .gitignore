@@ -56,3 +56,4 @@ prof/
 *.eggs
 .coverage
 Cargo.lock
+target/

@@ -62,7 +62,7 @@ fn adapt_error<T>(input: Result<T, NestedIntervalError>) -> Result<T, PyErr> {
     match input {
         Ok(x) => Ok(x),
         Err(x) => 
-                Err(PyErr::new::<exceptions::ValueError, _>(format!("{:?}", x)))
+            Err(exceptions::PyValueError::new_err(format!("{:?}", x)))
     }
 }
 
@@ -79,7 +79,7 @@ impl PyIntervalSet {
         let mut intervals = Vec::new();
         for tup in tups.iter() {
             if tup.0 > tup.1 {
-                return Err(PyErr::new::<exceptions::ValueError, _>("Negative interval"));
+                return Err(exceptions::PyValueError::new_err("Negative interval"))
             }
             intervals.push(tup.0..tup.1);
         }
@@ -101,7 +101,7 @@ impl PyIntervalSet {
         let mut ids = Vec::new();
         for tup in tups.iter() {
             if tup.0 > tup.1 {
-                return Err(PyErr::new::<exceptions::ValueError, _>("Negative interval"));
+                return Err(exceptions::PyValueError::new_err("Negative interval"))
             }
             intervals.push(tup.0..tup.1);
             ids.push(tup.2);
@@ -143,7 +143,7 @@ impl PyIntervalSet {
                 ids.iter()
                     .next()
                     .and_then(|i| Some(*i))
-                    .ok_or(PyErr::new::<exceptions::ValueError, _>("Empty ids"))?,
+                    .ok_or(exceptions::PyValueError::new_err("Empty ids"))?,
             );
             res.inner.push(tup);
         }
@@ -172,7 +172,7 @@ impl PyIntervalSet {
                 ids.iter()
                     .last()
                     .and_then(|i| Some(*i))
-                    .ok_or(PyErr::new::<exceptions::ValueError, _>("Empty ids"))?,
+                    .ok_or(exceptions::PyValueError::new_err("Empty ids"))?,
             );
             res.inner.push(tup);
         }
@@ -209,7 +209,7 @@ impl PyIntervalSet {
                 ids.iter()
                     .next()
                     .and_then(|i| Some(*i))
-                    .ok_or(PyErr::new::<exceptions::ValueError, _>("Empty ids"))?,
+                    .ok_or(exceptions::PyValueError::new_err("Empty ids"))?,
             );
         }
         Ok((out_starts, out_stops, out_ids).to_object(py))
@@ -264,7 +264,7 @@ impl PyIntervalSet {
                 ids.iter()
                     .next()
                     .and_then(|i| Some(*i))
-                    .ok_or(PyErr::new::<exceptions::ValueError, _>("Empty ids"))?,
+                    .ok_or(exceptions::PyValueError::new_err("Empty ids"))?,
             );
         }
         Ok((
