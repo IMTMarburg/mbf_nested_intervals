@@ -25,19 +25,19 @@ impl<T> TupleResult<T> {
     }
 }
 
-impl IntoPyObject for TupleResult<(u32, u32, Vec<u32>)> {
-    fn into_object(self, py: Python) -> PyObject {
-        self.inner.into_object(py)
+impl ToPyObject for TupleResult<(u32, u32, Vec<u32>)> {
+    fn to_object(&self, py: Python) -> PyObject {
+        self.inner.to_object(py)
     }
 }
-impl IntoPyObject for TupleResult<(u32, u32, u32)> {
-    fn into_object(self, py: Python) -> PyObject {
-        self.inner.into_object(py)
+impl ToPyObject for TupleResult<(u32, u32, u32)> {
+    fn to_object(&self, py: Python) -> PyObject {
+        self.inner.to_object(py)
     }
 }
-impl IntoPyObject for TupleResult<(u32, u32)> {
-    fn into_object(self, py: Python) -> PyObject {
-        self.inner.into_object(py)
+impl ToPyObject for TupleResult<(u32, u32)> {
+    fn to_object(&self, py: Python) -> PyObject {
+        self.inner.to_object(py)
     }
 }
 
@@ -116,7 +116,7 @@ impl PyIntervalSet {
             let tup = (iv.start, iv.end);
             res.inner.push(tup);
         }
-        Ok(res.into_object(py))
+        Ok(res.to_object(py))
     }
     ///
     /// Convert an IntervalSet into a list of tuples (start, stop, [ids])
@@ -126,7 +126,7 @@ impl PyIntervalSet {
             let tup = (iv.start, iv.end, ids.clone());
             res.inner.push(tup);
         }
-        Ok(res.into_object(py))
+        Ok(res.to_object(py))
     }
 
     /// Convert an IntervalSet into a list of tuples (start, stop, first_id)
@@ -147,7 +147,7 @@ impl PyIntervalSet {
             );
             res.inner.push(tup);
         }
-        Ok(res.into_object(py))
+        Ok(res.to_object(py))
     }
     /// Convert an IntervalSet into just the (unique) ids referenced
     ///
@@ -176,7 +176,7 @@ impl PyIntervalSet {
             );
             res.inner.push(tup);
         }
-        Ok(res.into_object(py))
+        Ok(res.to_object(py))
     }
 
     /// Convert an IntervalSet into a tuple of lists ([starts], [stops], [[ids]])
@@ -189,7 +189,7 @@ impl PyIntervalSet {
             out_stops.push(iv.end);
             out_ids.push(ids.clone());
         }
-        Ok((out_starts, out_stops, out_ids).into_object(py))
+        Ok((out_starts, out_stops, out_ids).to_object(py))
     }
 
     /// Convert an IntervalSet into a tuple of lists ([starts], [stops], [first_ids])
@@ -212,7 +212,7 @@ impl PyIntervalSet {
                     .ok_or(PyErr::new::<exceptions::ValueError, _>("Empty ids"))?,
             );
         }
-        Ok((out_starts, out_stops, out_ids).into_object(py))
+        Ok((out_starts, out_stops, out_ids).to_object(py))
     }
     /// Convert an IntervalSet into a tuple of (array(starts), array(stops))
     pub fn to_numpy(&self, py: Python) -> PyResult<PyObject> {
@@ -226,7 +226,7 @@ impl PyIntervalSet {
             numpy_from_vec_u32(out_starts)?,
             numpy_from_vec_u32(out_stops)?,
         )
-            .into_object(py))
+            .to_object(py))
     }
 
     /// Convert an IntervalSet into a tuple of (array(starts), array(stops), [[ids]])
@@ -242,9 +242,9 @@ impl PyIntervalSet {
         Ok((
             numpy_from_vec_u32(out_starts)?,
             numpy_from_vec_u32(out_stops)?,
-            out_ids.into_object(py),
+            out_ids.to_object(py),
         )
-            .into_object(py))
+            .to_object(py))
     }
 
     /// Convert an IntervalSet into a tuple of numpy.u32 arrays (start, stops, first_ids)
@@ -272,7 +272,7 @@ impl PyIntervalSet {
             numpy_from_vec_u32(out_stops)?,
             numpy_from_vec_u32(out_ids)?,
         )
-            .into_object(py))
+            .to_object(py))
     }
 
     pub fn invert(
