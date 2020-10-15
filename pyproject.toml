@@ -3,4 +3,4 @@ requires = ["maturin"]
 build-backend = "maturin"
 
 [tool.maturin]
-sdist-include = ["src/mbf_nested_intervals"]
+sdist-include = ["mbf_nested_intervals"]
