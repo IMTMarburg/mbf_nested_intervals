@@ -22,10 +22,8 @@ except VersionConflict:
 
 import subprocess 
 toolchains = subprocess.check_output(["rustup", "toolchain", "list"]).decode('utf-8').split("\n")
-nightlys = sorted([x[:x.find(' ') if x.find(' ') != -1 else None] for x in toolchains if x.startswith('stable')])
 import os
-os.environ['RUSTUP_TOOLCHAIN'] = nightlys[0] # use the oldest one...
-print("USING", os.environ['RUSTUP_TOOLCHAIN'])
+print("USING", os.environ.get('RUSTUP_TOOLCHAIN',''))
 
 
 if __name__ == "__main__":
