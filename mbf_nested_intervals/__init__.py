@@ -3,7 +3,7 @@ from mbf_nested_intervals import IntervalSet
 import pandas as pd
 import itertools
 
-__version__ = '0.2.7'
+__version__ = '0.2.8'
 
 
 def _df_to_tup(df):
@@ -43,8 +43,8 @@ def merge_df_intervals(df, iv_func=lambda iv: iv.merge_hull()):
         iv = IntervalSet.from_tuples_with_id(args)
         new_order = iv_func(iv).to_tuples_last_id()
         new_df = df.iloc[[x[2] for x in new_order]].copy()
-        new_df.at[:, "start"] = [x[0] for x in new_order]
-        new_df.at[:, "stop"] = [x[1] for x in new_order]
+        new_df.loc[:, "start"] = [x[0] for x in new_order]
+        new_df.loc[:, "stop"] = [x[1] for x in new_order]
         out.append(new_df)
     res = pd.concat(out)
     if strand_added:
