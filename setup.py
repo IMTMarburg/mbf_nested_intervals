@@ -21,9 +21,9 @@ except VersionConflict:
     sys.exit(1)
 
 import subprocess 
-toolchains = subprocess.check_output(["rustup", "toolchain", "list"]).decode('utf-8').split("\n")
+#toolchains = subprocess.check_output(["rustup", "toolchain", "list"]).decode('utf-8').split("\n")
 import os
-print("USING", os.environ.get('RUSTUP_TOOLCHAIN',''))
+#print("USING", os.environ.get('RUSTUP_TOOLCHAIN',''))
 
 
 if __name__ == "__main__":
