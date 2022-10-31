@@ -78,8 +78,8 @@ impl PyIntervalSet {
         let py = gil.python();
         let mut intervals = Vec::new();
         for tup in tups.iter() {
-            if tup.0 > tup.1 {
-                return Err(exceptions::PyValueError::new_err("Negative interval"))
+            if tup.0 >= tup.1 {
+                return Err(exceptions::PyValueError::new_err(format!("Negative or empty interval {:?}", tup)))
             }
             intervals.push(tup.0..tup.1);
         }
@@ -100,8 +100,8 @@ impl PyIntervalSet {
         let mut intervals = Vec::new();
         let mut ids = Vec::new();
         for tup in tups.iter() {
-            if tup.0 > tup.1 {
-                return Err(exceptions::PyValueError::new_err("Negative interval"))
+            if tup.0 >= tup.1 {
+                return Err(exceptions::PyValueError::new_err(format!("Negative or empty interval {:?}", tup)))
             }
             intervals.push(tup.0..tup.1);
             ids.push(tup.2);
