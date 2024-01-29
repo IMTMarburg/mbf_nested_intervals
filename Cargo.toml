@@ -1,6 +1,6 @@
 [package]
 name = "mbf_nested_intervals"
-version = "0.2.9"
+version = "0.2.10"
 authors = ["Florian Finkernagel <finkernagel@imt.uni-marburg.de>"]
 edition = "2018"
 
