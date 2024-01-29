@@ -9,10 +9,17 @@
 """
 import sys
 
-from pkg_resources import require, VersionConflict
 from setuptools import setup
 
 from setuptools_rust import Binding, RustExtension
+
+try:
+    from setuptools_rust import Binding, RustExtension
+
+    has_rust = True
+except ImportError:
+    has_rust = False
+    pass
 
 try:
     require("setuptools>=38.3")
@@ -20,14 +27,24 @@ except VersionConflict:
     print("Error: version of setuptools is too old (<38.3)!")
     sys.exit(1)
 
-import subprocess 
-#toolchains = subprocess.check_output(["rustup", "toolchain", "list"]).decode('utf-8').split("\n")
-import os
-#print("USING", os.environ.get('RUSTUP_TOOLCHAIN',''))
+# import subprocess
+# toolchains = subprocess.check_output(["rustup", "toolchain", "list"]).decode('utf-8').split("\n")
+# nightlys = sorted([x[:x.find(' ') if x.find(' ') != -1 else None] for x in toolchains if x.startswith('nightly')])
+# import os
+# os.environ['RUSTUP_TOOLCHAIN'] = nightlys[0] # use the oldest one...
+# print("USING", os.environ['RUSTUP_TOOLCHAIN'])
 
 
 if __name__ == "__main__":
-    setup(
-        rust_extensions=[RustExtension("mbf_nested_intervals.mbf_nested_intervals", 
-                                       binding=Binding.PyO3, debug=False)],
-    )
+    if has_rust:
+        setup(
+            rust_extensions=[
+                RustExtension(
+                    "mbf_nested_intervals.mbf_nested_intervals",
+                    binding=Binding.PyO3,
+                    debug=False,
+                )
+            ],
+        )
+    else:
+        setup()
