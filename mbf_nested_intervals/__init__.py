@@ -67,8 +67,8 @@ def merge_df_intervals_with_callback(df, callback):
         subsets = iv.merge_hull().to_tuples_with_id()
         for s in subsets:
             sub_df = df.iloc[list(s[2])].copy()
-            sub_df.at[:, "start"] = s[0]
-            sub_df.at[:, "stop"] = s[1]
+            sub_df.loc[:, "start"] = s[0]
+            sub_df.loc[:, "stop"] = s[1]
             row_data = callback(sub_df)
             if not isinstance(
                 row_data, dict
