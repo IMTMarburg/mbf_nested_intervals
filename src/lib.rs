@@ -1,14 +1,13 @@
 use nested_intervals::{IntervalSet, NestedIntervalError};
 use pyo3::exceptions;
 use pyo3::prelude::*;
-use pyo3::class::PyObjectProtocol;
 use pyo3::types::PyType;
 use pyo3::Py;
 mod numpy;
 use numpy::numpy_from_vec_u32;
 use std::collections::HashSet;
 
-#[pyclass(name=IntervalSet)]
+#[pyclass(name="IntervalSet")]
 struct PyIntervalSet {
     inner: IntervalSet,
 }
@@ -41,17 +40,6 @@ impl ToPyObject for TupleResult<(u32, u32)> {
     }
 }
 
-#[pyproto]
-    impl<'p> PyObjectProtocol<'p> for PyIntervalSet {
-        fn __str__(&self) -> PyResult<String> {
-            Ok(format!("IntervalSet(with {} intervals)",self.inner.len()))
-        }
-        /*fn __repr__(&self) -> PyResult<String> {
-            Ok(format!("{:?}", ZZZ))
-        }
-        */
-    }
-
 /// Helper for returning interval sets as python objects
 fn return_interval_set(py: Python, iv: IntervalSet) -> PyResult<Py<PyIntervalSet>> {
     let obj = Py::new(py, PyIntervalSet { inner: iv }).unwrap();
@@ -68,14 +56,20 @@ fn adapt_error<T>(input: Result<T, NestedIntervalError>) -> Result<T, PyErr> {
 
 #[pymethods]
 impl PyIntervalSet {
+
+    fn __str__(&self) -> PyResult<String> {
+            Ok(format!("IntervalSet(with {} intervals)",self.inner.len()))
+    }
+
+
     /// Create an IntervalSet from a list of tuples (start, stop)
     ///
     /// Example:
     /// IntervalSet.from_tuples([(0,10), (30, 40)]
     #[classmethod]
-    pub fn from_tuples(_cls: &PyType, tups: Vec<(u32, u32)>) -> PyResult<Py<PyIntervalSet>> {
-        let gil = Python::acquire_gil();
-        let py = gil.python();
+    pub fn from_tuples(_cls: &PyType, tups: Vec<(u32, u32)>, py: Python) -> PyResult<Py<PyIntervalSet>> {
+        //let gil = Python::acquire_gil();
+        //let py = gil.python();
         let mut intervals = Vec::new();
         for tup in tups.iter() {
             if tup.0 >= tup.1 {
@@ -94,9 +88,8 @@ impl PyIntervalSet {
     pub fn from_tuples_with_id(
         _cls: &PyType,
         tups: Vec<(u32, u32, u32)>,
+        py: Python,
     ) -> PyResult<Py<PyIntervalSet>> {
-        let gil = Python::acquire_gil();
-        let py = gil.python();
         let mut intervals = Vec::new();
         let mut ids = Vec::new();
         for tup in tups.iter() {
@@ -223,8 +216,8 @@ impl PyIntervalSet {
             out_stops.push(iv.end);
         }
         Ok((
-            numpy_from_vec_u32(out_starts)?,
-            numpy_from_vec_u32(out_stops)?,
+            numpy_from_vec_u32(out_starts, py)?,
+            numpy_from_vec_u32(out_stops, py)?,
         )
             .to_object(py))
     }
@@ -240,8 +233,8 @@ impl PyIntervalSet {
             out_ids.push(ids.clone());
         }
         Ok((
-            numpy_from_vec_u32(out_starts)?,
-            numpy_from_vec_u32(out_stops)?,
+            numpy_from_vec_u32(out_starts, py)?,
+            numpy_from_vec_u32(out_stops, py)?,
             out_ids.to_object(py),
         )
             .to_object(py))
@@ -268,9 +261,9 @@ impl PyIntervalSet {
             );
         }
         Ok((
-            numpy_from_vec_u32(out_starts)?,
-            numpy_from_vec_u32(out_stops)?,
-            numpy_from_vec_u32(out_ids)?,
+            numpy_from_vec_u32(out_starts, py)?,
+            numpy_from_vec_u32(out_stops, py)?,
+            numpy_from_vec_u32(out_ids, py)?,
         )
             .to_object(py))
     }

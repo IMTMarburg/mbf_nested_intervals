@@ -1,4 +1,5 @@
 # Temporary and binary files
+
 *~
 *.py[cod]
 *.so
@@ -57,3 +58,4 @@ prof/
 .coverage
 Cargo.lock
 target/
+target_rust_analyzer/

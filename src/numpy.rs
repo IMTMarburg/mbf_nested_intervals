@@ -3,12 +3,10 @@ use pyo3::{PyResult};
 
 use pyo3::types::PyDict;
 
-pub fn numpy_from_vec_u32(input: Vec<u32>) -> PyResult<PyObject> {
+pub fn numpy_from_vec_u32(input: Vec<u32>, py: Python) -> PyResult<PyObject> {
     let len = input.len();
 
     //import numpy
-    let gil = Python::acquire_gil();
-    let py = gil.python();
     let locals = PyDict::new(py);
     locals.set_item("numpy", py.import("numpy")?)?;
 
