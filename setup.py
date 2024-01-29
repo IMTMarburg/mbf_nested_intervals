@@ -9,9 +9,8 @@
 """
 import sys
 
+from pkg_resources import require, VersionConflict
 from setuptools import setup
-
-from setuptools_rust import Binding, RustExtension
 
 try:
     from setuptools_rust import Binding, RustExtension
