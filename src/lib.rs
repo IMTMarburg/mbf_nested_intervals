@@ -412,6 +412,16 @@ impl PyIntervalSet {
         let ivs: Vec<_> = other.iter().map(|x| &x.inner).collect();
         return_interval_set(py, self.inner.filter_to_overlapping_k_others(&ivs, max_k))
     }
+
+    pub fn filter_to_overlapping_and_split(
+        &mut self,
+        py: Python,
+        other: &PyIntervalSet,
+    ) -> PyResult<Py<PyIntervalSet>> {
+        return_interval_set(py, self.inner.filter_to_overlapping_and_split(&other.inner))
+    }
+
+
 }
 
 /// Wrapper around nested intervals
