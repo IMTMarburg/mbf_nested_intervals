@@ -62,8 +62,12 @@
         npkgs.git
         npkgs.cargo-udeps
         npkgs.cargo-audit
+        npkgs.cargo-vet
+        npkgs.cargo-outdated
         npkgs.bacon
         npkgs.maturin
+        (npkgs.python3.withPackages (p: [p.pytest p.pytest-cov p.pandas p.tomlkit]))
+
       ];
     };
   };

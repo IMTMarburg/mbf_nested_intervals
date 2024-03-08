@@ -7,7 +7,7 @@ mod numpy;
 use numpy::numpy_from_vec_u32;
 use std::collections::HashSet;
 
-#[pyclass(name="IntervalSet")]
+#[pyclass(name = "IntervalSet")]
 struct PyIntervalSet {
     inner: IntervalSet,
 }
@@ -49,31 +49,35 @@ fn return_interval_set(py: Python, iv: IntervalSet) -> PyResult<Py<PyIntervalSet
 fn adapt_error<T>(input: Result<T, NestedIntervalError>) -> Result<T, PyErr> {
     match input {
         Ok(x) => Ok(x),
-        Err(x) => 
-            Err(exceptions::PyValueError::new_err(format!("{:?}", x)))
+        Err(x) => Err(exceptions::PyValueError::new_err(format!("{:?}", x))),
     }
 }
 
 #[pymethods]
 impl PyIntervalSet {
-
     fn __str__(&self) -> PyResult<String> {
-            Ok(format!("IntervalSet(with {} intervals)",self.inner.len()))
+        Ok(format!("IntervalSet(with {} intervals)", self.inner.len()))
     }
-
 
     /// Create an IntervalSet from a list of tuples (start, stop)
     ///
     /// Example:
     /// IntervalSet.from_tuples([(0,10), (30, 40)]
     #[classmethod]
-    pub fn from_tuples(_cls: &PyType, tups: Vec<(u32, u32)>, py: Python) -> PyResult<Py<PyIntervalSet>> {
+    pub fn from_tuples(
+        _cls: &PyType,
+        tups: Vec<(u32, u32)>,
+        py: Python,
+    ) -> PyResult<Py<PyIntervalSet>> {
         //let gil = Python::acquire_gil();
         //let py = gil.python();
         let mut intervals = Vec::new();
         for tup in tups.iter() {
             if tup.0 >= tup.1 {
-                return Err(exceptions::PyValueError::new_err(format!("Negative or empty interval {:?}", tup)))
+                return Err(exceptions::PyValueError::new_err(format!(
+                    "Negative or empty interval {:?}",
+                    tup
+                )));
             }
             intervals.push(tup.0..tup.1);
         }
@@ -94,12 +98,18 @@ impl PyIntervalSet {
         let mut ids = Vec::new();
         for tup in tups.iter() {
             if tup.0 >= tup.1 {
-                return Err(exceptions::PyValueError::new_err(format!("Negative or empty interval {:?}", tup)))
+                return Err(exceptions::PyValueError::new_err(format!(
+                    "Negative or empty interval {:?}",
+                    tup
+                )));
             }
             intervals.push(tup.0..tup.1);
             ids.push(tup.2);
         }
-        return_interval_set(py, adapt_error(IntervalSet::new_with_ids(&intervals, &ids))?)
+        return_interval_set(
+            py,
+            adapt_error(IntervalSet::new_with_ids(&intervals, &ids))?,
+        )
     }
 
     /// Convert an IntervalSet into a list of tuples (start, stop, [ids])
@@ -145,11 +155,16 @@ impl PyIntervalSet {
     /// Convert an IntervalSet into just the (unique) ids referenced
     ///
     pub fn to_ids(&self) -> PyResult<Vec<u32>> {
-        let result: HashSet<u32> = self.inner.iter().map(|(_iv, ids) | ids).flatten().map(|x| *x).collect();
+        let result: HashSet<u32> = self
+            .inner
+            .iter()
+            .map(|(_iv, ids)| ids)
+            .flatten()
+            .map(|x| *x)
+            .collect();
         let result = result.iter().map(|x| *x).collect();
         Ok(result)
     }
-    
 
     /// Convert an IntervalSet into a list of tuples (start, stop, last_id)
     ///
@@ -296,8 +311,23 @@ impl PyIntervalSet {
         return_interval_set(py, self.inner.remove_duplicates())
     }
 
+    pub fn remove_empty(&self, py: Python) -> PyResult<Py<PyIntervalSet>> {
+        return_interval_set(py, self.inner.remove_empty())
+    }
+
     pub fn any_overlapping(&self) -> PyResult<bool> {
         Ok(self.inner.any_overlapping())
+    }
+    pub fn any_nested(&self) -> PyResult<bool> {
+        Ok(self.inner.any_nested())
+    }
+
+    pub fn mean_interval_size(&self) -> PyResult<f64> {
+        Ok(self.inner.mean_interval_size())
+    }
+
+    pub fn covered_units(&self) -> PyResult<u32> {
+        Ok(self.inner.covered_units())
     }
 
     pub fn overlap_status(&self) -> PyResult<Vec<bool>> {
@@ -319,7 +349,69 @@ impl PyIntervalSet {
             None => None,
         })
     }
-    
+    pub fn find_closest_start_left(&mut self, pos: u32) -> PyResult<Option<(u32, u32, Vec<u32>)>> {
+        let found = self.inner.find_closest_start_left(pos);
+        Ok(match found {
+            Some((interval, ids)) => Some((interval.start, interval.end, ids)),
+            None => None,
+        })
+    }
+
+    pub fn find_closest_start_right(&mut self, pos: u32) -> PyResult<Option<(u32, u32, Vec<u32>)>> {
+        let found = self.inner.find_closest_start_right(pos);
+        Ok(match found {
+            Some((interval, ids)) => Some((interval.start, interval.end, ids)),
+            None => None,
+        })
+    }
+
+    pub fn union(
+        &mut self,
+        py: Python,
+        other: Vec<PyRef<PyIntervalSet>>,
+    ) -> PyResult<Py<PyIntervalSet>> {
+        let ivs: Vec<_> = other.iter().map(|x| &x.inner).collect();
+        return_interval_set(py, self.inner.union(&ivs))
+    }
+
+    pub fn filter_to_non_overlapping(
+        &mut self,
+        py: Python,
+        other: &PyIntervalSet,
+    ) -> PyResult<Py<PyIntervalSet>> {
+        return_interval_set(py, self.inner.filter_to_non_overlapping(&other.inner))
+    }
+
+    pub fn filter_to_non_overlapping_k_others(
+        &mut self,
+        py: Python,
+        other: Vec<PyRef<PyIntervalSet>>,
+        max_k: u32,
+    ) -> PyResult<Py<PyIntervalSet>> {
+        let ivs: Vec<_> = other.iter().map(|x| &x.inner).collect();
+        return_interval_set(
+            py,
+            self.inner.filter_to_non_overlapping_k_others(&ivs, max_k),
+        )
+    }
+
+    pub fn filter_to_overlapping(
+        &mut self,
+        py: Python,
+        other: &PyIntervalSet,
+    ) -> PyResult<Py<PyIntervalSet>> {
+        return_interval_set(py, self.inner.filter_to_overlapping(&other.inner))
+    }
+
+    pub fn filter_to_overlapping_k_others(
+        &mut self,
+        py: Python,
+        other: Vec<PyRef<PyIntervalSet>>,
+        max_k: u32,
+    ) -> PyResult<Py<PyIntervalSet>> {
+        let ivs: Vec<_> = other.iter().map(|x| &x.inner).collect();
+        return_interval_set(py, self.inner.filter_to_overlapping_k_others(&ivs, max_k))
+    }
 }
 
 /// Wrapper around nested intervals

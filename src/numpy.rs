@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use pyo3::{PyResult};
+use pyo3::PyResult;
 
 use pyo3::types::PyDict;
 
@@ -86,4 +86,3 @@ pub fn numpy_from_vec_i8(input: Vec<i8>) -> PyResult<PyObject> {
     Ok(result)
 }
 */
-

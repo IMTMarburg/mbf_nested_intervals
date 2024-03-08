@@ -1,11 +1,11 @@
 [package]
 name = "mbf_nested_intervals"
-version = "0.2.11"
+version = "0.3.0"
 authors = ["Florian Finkernagel <finkernagel@imt.uni-marburg.de>"]
 edition = "2018"
 
 [dependencies]
-nested_intervals="0.2.0"
+nested_intervals="0.5.1"
 pyo3={ version = "0.20.*", features= ["extension-module"]}
 
 [lib]
