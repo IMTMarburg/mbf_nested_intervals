@@ -14,6 +14,7 @@ class TestIntervalSetCreation:
             (1,15),
             (1,10),
         ]
+        assert len(i) == 3
  
     def test_from_tuples_with_id(self):
         i = IntervalSet.from_tuples_with_id([

@@ -3,7 +3,7 @@ from mbf_nested_intervals import IntervalSet
 import pandas as pd
 import itertools
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 
 def _df_to_tup(df):

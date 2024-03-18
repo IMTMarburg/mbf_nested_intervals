@@ -422,6 +422,10 @@ impl PyIntervalSet {
     }
 
 
+    pub fn __len__(&self) -> PyResult<usize> {
+        Ok(self.inner.len())
+    }
+
 }
 
 /// Wrapper around nested intervals
