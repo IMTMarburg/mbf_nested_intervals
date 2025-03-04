@@ -12,7 +12,7 @@ jobs:
       with:
         manylinux: auto
         command: build
-        args: --release -o dist -i python3.10 -i python3.11 -i python3.12
+        args: --release -o dist 
     - name: Upload wheels
       uses: actions/upload-artifact@v3
       with:
